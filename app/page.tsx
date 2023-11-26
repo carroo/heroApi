@@ -1,113 +1,111 @@
-import Image from 'next/image'
+"use client";
+import { useEffect, useState } from "react";
+import ViewList from "./Component/ViewList";
+import ViewDetail from "./Component/ViewDetail";
+import Footer from "./Component/Footer";
+import LoadingChar from "./Component/LoadingChar";
+import LoadingDetail from "./Component/LoadingDetail";
+export default function App() {
+  const [query, setQuery] = useState("spider");
+  const [characters, setCharacters] = useState([]);
+  const [selectedCharacter, setSelectedCharacter] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-export default function Home() {
+  useEffect(() => {
+    setIsLoading(true);
+    if (query.length > 0) {
+      const fetchData = async () => {
+        const url = `https://www.superheroapi.com/api.php/3161278757529559/search/${query}`;
+
+        try {
+          const response = await fetch(url);
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+          const result = await response.json();
+          if (result.response == "success") {
+            setCharacters(result.results);
+            setSelectedCharacter(null);
+            setIsLoading(false);
+          } else {
+            setCharacters([]);
+            setSelectedCharacter(null);
+            setIsLoading(true);
+          }
+        } catch (error) {
+          console.error("Error fetching data:", error);
+          console.log(error);
+        }
+      };
+      fetchData();
+    }
+  }, [query]);
+
+  function handleselectedCharacter(id: any) {
+    const newcharacter = characters.filter((character) => character.id === id);
+    setSelectedCharacter(newcharacter[0]);
+  }
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+    <>
+      <header className="bg-secondary w-full p-4 mb-5">
+        <div className="container flex justify-center">
+          <h2 className="font-extrabold font-sans text-4xl text-white">
+            SuperHero Api
+          </h2>
         </div>
-      </div>
-
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
+      </header>
+      <nav className="container">
+        <div className="mt-3 flex flex-col justify-center">
+          <input
+            className="w-2/5 block mx-auto h-5 p-4 pb-5 rounded-2xl text-2xl mb-2"
+            type="text"
+            placeholder="Search Character ..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+          <p className="mx-auto text-white text-base">
+            Found <strong>{characters.length}</strong> results
           </p>
-        </a>
+        </div>
+      </nav>
 
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
+      <main className="pt-3 mb-24">
+        <div className="container">
+          <div className="flex flex-wrap mx-32">
+            <div className="w-1/2 px-3 overflow-y-auto h-screen">
+              <div className="border-black border-2 bg-white rounded-lg flex flex-wrap">
+                {isLoading ? (
+                  <ul className="w-full">
+                    <LoadingChar />
+                    <LoadingChar />
+                    <LoadingChar />
+                  </ul>
+                ) : (
+                  <ul className="w-full">
+                    {characters?.map((character) => (
+                      <ViewList
+                        character={character}
+                        onSelectedCharacter={handleselectedCharacter}
+                      />
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
+            <div className="w-1/2 px-3 overflow-y-auto h-screen">
+              {selectedCharacter ? (
+                <ViewDetail selectedCharacter={selectedCharacter} />
+              ) : (
+                <LoadingDetail />
+              )}
+            </div>
+          </div>
+        </div>
+      </main>
 
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  )
+      <Footer/>
+    </>
+  );
 }
+
